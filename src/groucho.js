@@ -130,7 +130,7 @@ var groucho = window.groucho || {};
         matchable = new RegExp("^track." + group + ".", "g"),
         record;
 
-    for (var i = 0; i < results.length; i++) {
+    for (i in results) {
       // Remove unwanted types and return records.
       if (group) {
         if (results[i].match(matchable) !== null) {
@@ -215,7 +215,8 @@ var groucho = window.groucho || {};
       }
       // Get those with top count.
       for (tid in returnTerms[vocName]) {
-        if (returnTerms[vocName][tid].count < topCount) {
+        if (returnTerms[vocName][tid].count < topCount ||
+            returnTerms[vocName][tid].count <= threshold) {
           delete returnTerms[vocName][tid];
         }
       }
