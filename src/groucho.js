@@ -120,35 +120,106 @@ var groucho = window.groucho || {};
    * Access records of a specific tracking group.
    *
    * @param {string} group
-   *   Name of the tracking group to return values for.
+   *   Strucutured conditions for activity lookup: {type, [conditionList]}.
+   * @param {array} conditions
+   *   List of acceptable property [key/[values]] objects.
    *
    * return {array}
    *   List of tracking localStorage entries.
    */
-  groucho.getActivities = function getActivities(group) {
+  groucho.getActivities = function getActivities(type, conditionList) {
 
-    var results = $.jStorage.index(),
+    // Optional params.
+    var group = type || false,
+        conditions = conditionList || false,
+        groupMatch = new RegExp("^track." + group + ".", "g"),
+        results = $.jStorage.index(),
         returnVals = [],
-        matchable = new RegExp("^track." + group + ".", "g"),
         record;
 
-    for (var i in results) {
-      // Remove unwanted types and return records.
-      if (group) {
-        if (results[i].match(matchable) !== null) {
-          // Collect relevant.
-          record = $.jStorage.get(results[i]);
-          // Move key to property.
-          record._key = results[i];
-          returnVals.push(record);
+    /**
+     * Confirm properties are of desired values.
+     * NOTE: String comparisons only!
+     *
+     * @param  {array} conditions
+     *   List of acceptable property [key/[values]] objects.
+     * @param  {string} record
+     *   History record to check against.
+     *
+     * @return {boolean}
+     *   Result of match check.
+     */
+    function checkProperties(conditions, record) {
+      // Check all conditions, be picky about type.
+      if (conditions && conditions instanceof Array) {
+        for (var i in conditions) {
+          // Confirm an acceptable value.
+          if (checkValues(i, conditions[i], record)) {
+            addRecord(record);
+          }
+
         }
       }
       else {
-        // Collect and return all.
-        record = $.jStorage.get(results[i]);
-        // Move key to property.
-        record._key = results[i];
-        returnVals.push(record);
+        // No conditions, or wrong type-- add everything.
+        addRecord(record);
+      }
+    }
+
+    /**
+     * Confirm one of values matches the record.
+     * NOTE: String comparisons only!
+     *
+     * @param  {string} property
+     *   Property to check.
+     * @param {array} values
+     *   List of acceptable values.
+     * @param  {string} record
+     *   History record to check against.
+     *
+     * @return {boolean}
+     *   Result of match check.
+     */
+    function checkValues(property, values, record) {
+      // Check all values, be picky about type.
+      if (values instanceof Array) {
+        for (var i in values) {
+          // Confirm an acceptable value.
+          if (record.hasOwnProperty(property) && record.property === values[i]) {
+            addRecord(record);
+            // Only need one match per value set.
+            break;
+          }
+        }
+      }
+    }
+
+    /**
+     * Grab record from storage, add to returns.
+     *
+     * @param string key
+     *   Browser storage lookup key.
+     */
+    function addRecord(key) {
+      record = $.jStorage.get(key);
+      // Move key to special property.
+      record._key = key;
+      returnVals.push(record);
+    }
+
+
+    // Look through storage index.
+    for (var i in results) {
+      // Remove unwanted types and return records.
+      if (group) {
+        if (results[i].match(groupMatch) !== null) {
+          // Move on to checking conditions (potentially just add it).
+          checkProperties(conditions, results[i]);
+        }
+      }
+      else {
+        // Just check property or just add.
+        checkProperties(conditions, results[i]);
       }
     }
 

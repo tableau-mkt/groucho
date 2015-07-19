@@ -127,7 +127,7 @@
       timeout = i * 150;
       stop();
       setTimeout(function () {
-          groucho.createActivity('fake_thing', fakeData);
+        groucho.createActivity('fake_thing', fakeData);
         start();
       }, timeout);
     }
@@ -158,6 +158,119 @@
 
   });
 
+  //@todo Confirm granular activity request work.
+  test('Activity retrieval', 0, function() {
+
+    // Mock functions.
+    var counters = {
+      'checkProperties': 0,
+      'checkValues': 0,
+      'addRecord': 0
+    };
+    groucho.getActivities.checkProperties = function() {
+      counters[this.name]++
+    };
+    groucho.getActivities.checkValues = function() {
+      counters[this.name]++
+    };
+    groucho.getActivities.addRecord = function() {
+      counters[this.name]++
+    };
+
+    // Create activities!
+    groucho.createActivity('testThingy', {
+      'neato' : 'definately',
+      'yep' : 'probably'
+    });
+    groucho.createActivity('testStuff', {
+      'neato' : 'definately',
+      'yep' : 'probably'
+    });
+    groucho.createActivity('testThingy', {
+      'neato' : 'unclear'
+    });
+    groucho.createActivity('testThingy', {
+      'wow' : 'indeed',
+      'yep' : 'probably'
+    });
+
+    // Tests...
+    groucho.getActivities('testThingy');
+
+    groucho.getActivities('testStuff');
+
+    groucho.getActivities('testThingy', [
+      {'neato' : ['definately']}
+    ]);
+
+    groucho.getActivities('testThingy', [
+      {'neato' : ['definately', 'unclear']}
+    ]);
+
+    groucho.getActivities('testThingy', [
+      {'neato' : ['definately']},
+      {'wow' : ['indeed']}
+    ]);
+
+    groucho.createActivity('testStuff', [
+      {'neato' : ['unclear']},
+      {'neato' : ['definately']}
+    ]);
+
+
+
+
+/*
+
+    groucho.getActivities();
+
+    groucho.getActivities('fake_thing');
+
+    groucho.getActivities('wrong');
+
+    groucho.getActivities(
+      'fake_thing',
+      [{'entityBundle'}]
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      [{'entityBundle' : 'article'}]
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      [{entityBundle' : ['article']}]
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      [{'entityBundle' : ['wrong', 'article']}}
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      ['entityBundle' : ['wrong']}]
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      [
+        {entityBundle' : ['article']},
+        {entityBundle' : ['article']}
+      ]
+    });
+
+    groucho.getActivities({
+      'fake_thing',
+      [
+        {entityBundle' : ['article']},
+        {entityBundle' : ['profile', 'blog']}
+      ]
+    });
+*/
+
+  });
 
   module('Favorites');
 
