@@ -24,7 +24,7 @@ var groucho = window.groucho || {};
 
     // Handle empty config.
     if (!groucho.hasOwnProperty('config')) {
-      groucho.config = groucho.defaults;
+      groucho.config = defaults;
     }
     else {
       // Set each empty config to the defaults.

@@ -1,4 +1,4 @@
-/*! Groucho - v0.2.3 - 2017-05-07
+/*! Groucho - v0.2.3 - 2017-09-04
 * https://github.com/tableau-mkt/groucho
 * Copyright (c) 2017 Josh Lind; Licensed MIT */
 
@@ -183,12 +183,18 @@ var groucho = window.groucho || {};
         'addons': {}
       };
 
-  // Set empty configs to defaults.
-  for (var config in defaults) {
-    if (!groucho.config.hasOwnProperty(config)) {
-      groucho.config[config] = defaults[config];
+    // Handle empty config.
+    if (!groucho.hasOwnProperty('config')) {
+      groucho.config = defaults;
     }
-  }
+    else {
+      // Set each empty config to the defaults.
+      for (var setting in defaults) {
+        if (!groucho.config.hasOwnProperty(setting)) {
+          groucho.config[setting] = defaults[setting];
+        }
+      }
+    }
 
   // Data availability.
   groucho.userDeferred = groucho.userDeferred || $.Deferred();

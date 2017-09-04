@@ -68,6 +68,7 @@ module.exports = function(grunt) {
           // @todo Extendable.
           urls: [
             'storage=false',
+            'config=false',
             '',
             // 'jquery=1.5.2&jstorage=0.4.12',
             // 'jquery=1.6.4&jstorage=0.4.12',
