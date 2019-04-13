@@ -66,6 +66,11 @@
         if (!location.href.match(/\?noflush\=|&noflush\=/)) {
           groucho.storage.clear();
         }
+        // Act as if config was not set in mock file
+        if (location.search.match(/[?&]config=false/) !== null) {
+          window._config = groucho.config
+          delete groucho.config;
+        }
         return simpleInclude('../src/groucho.js');
       })
       .then(function() {
@@ -73,6 +78,9 @@
         var test = 'groucho_test.js';
         if (location.search.match(/[?&]storage=false/) !== null) {
           test = 'groucho_storage_errors.js';
+        }
+        if (location.search.match(/[?&]config=false/) !== null) {
+          test = 'groucho_config_test.js';
         }
         // Load test.
         return simpleInclude(test);

@@ -22,18 +22,18 @@ var groucho = window.groucho || {};
         'addons': {}
       };
 
-  // Handle empty config.
-  if (!groucho.hasOwnProperty('config')) {
-    groucho.config = groucho.defaults;
-  } 
-  else {
-    // Set empty configs to defaults.
-    for (var setting in defaults) {
-      if (!groucho.config.hasOwnProperty(setting)) {
-        groucho.config[setting] = defaults[setting];
+    // Handle empty config.
+    if (!groucho.hasOwnProperty('config')) {
+      groucho.config = defaults;
+    }
+    else {
+      // Set each empty config to the defaults.
+      for (var setting in defaults) {
+        if (!groucho.config.hasOwnProperty(setting)) {
+          groucho.config[setting] = defaults[setting];
+        }
       }
     }
-  }
 
   // Data availability.
   groucho.userDeferred = groucho.userDeferred || $.Deferred();
