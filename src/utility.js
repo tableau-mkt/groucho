@@ -6,6 +6,8 @@
  * groucho.userSet = function({country: "US"});
  */
 
+/* jslint latedef:false */
+
 var groucho = window.groucho || {};
 
 (function($, groucho) {
@@ -110,51 +112,63 @@ var groucho = window.groucho || {};
   groucho.getActivities = function (group) {
     var results = groucho.storage.index(),
         returnVals = [],
-        matchable = (group) ? new RegExp("^track." + group + ".", "g") : false,
-        record;
+        matchable = (group) ? new RegExp("^track." + group + ".", "g") : false;
 
     for (var i in results) {
       // Safety measure.
       if (!results.hasOwnProperty(i)) continue;
 
-      // Remove unwanted types and return records.
-      if (group) {
-        if (results[i].match(matchable) !== null) {
-          // Collect relevant.
-          record = groucho.storage.get(results[i]);
-          // Move key to property.
-          record._key = results[i];
-          returnVals.push(record);
-        }
+      // Collect and return all.
+      if (!group) {
+        addRecordRow(returnVals, results[i]);
       }
-      else {
-        // Collect and return all.
-        record = groucho.storage.get(results[i]);
-        // Move key to property.
-        record._key = results[i];
-        returnVals.push(record);
+      // Remove unwanted types, return relevant records.
+      else if (results[i].match(matchable) !== null) {
+        addRecordRow(returnVals, results[i]);
       }
     }
 
-    // Ensure proper key sorting regardless of index result order.
-    returnVals.sort(function (a, b) {
-      // Created non-standard or outside Groucho.
-      // Should always contain an original key which contains a dot.
-      if (!a.hasOwnProperty('_key') || !a._key.match(/\./) ||
-          !b.hasOwnProperty('_key') || !b._key.match(/\./)) {
-        return 0;
-      }
-      // Sort by post-prefix key.
-      if (parseInt(b._key.split('.')[2], 10) > parseInt(a._key.split('.')[2], 10)) {
-        return -1;
-      }
-      else {
-        return 1;
-      }
-    });
-
-    return returnVals;
+    // Ensure key sort regardless of session index, especially for timestamps.
+    return returnVals.sort(sortActivities);
   };
+
+
+  /**
+   * Add record to collected values list, and move key to property.
+   *
+   * @param {object} list
+   *   Array of records to be added to.
+   * @param {string} name
+   */
+  function addRecordRow (list, name) {
+    var record = groucho.storage.get(name);
+    record._key = name;
+    list.push(record);
+  }
+
+
+  /**
+   * Sort after Groucho prefix, eliminate other entries.
+   *
+   * @param {string} a
+   * @param {string} b
+   *
+   * @return {number}
+   */
+  function sortActivities (a, b) {
+    // Eliminate storage entries outside Groucho.
+    if (!a.hasOwnProperty('_key') || !a._key.match(/\./) ||
+        !b.hasOwnProperty('_key') || !b._key.match(/\./)) {
+      return 0;
+    }
+    // Sort by post-prefix key.
+    if (parseInt(b._key.split('.')[2], 10) > parseInt(a._key.split('.')[2], 10)) {
+      return -1;
+    }
+    else {
+      return 1;
+    }
+  }
 
 
   /**
