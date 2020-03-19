@@ -37,17 +37,23 @@ var groucho = window.groucho || {};
 
   // Data availability.
   groucho.userDeferred = groucho.userDeferred || $.Deferred();
-  // Make favorites "static".
+  // Make favorites static.
   groucho.favoriteTerms = false;
 
   // React to page load.
-  $(document).ready(function () {
+  $(document).ready(function grouchoInit () {
+    // Manage page for later adjuments.
+    //groucho.personalizeInit();
     // Data transforms due to version updates.
     groucho.schema();
     // Automatic events.
     groucho.trackOrigins();
     groucho.trackHit();
     groucho.trackClicks();
+    // Update configured user preferences.
+    groucho.favorites();
+    // Adjust page.
+    groucho.personalize();
   });
 
 })(window.jQuery || window.Zepto || window.$, groucho);

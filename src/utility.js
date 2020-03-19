@@ -1,9 +1,5 @@
 /**
- * @file Library utilities for accessing data strcuture.
- *
- * Helper functions used throughout the library for common operations.
- *
- * groucho.userSet = function({country: "US"});
+ * @file Library utilities for common operations like accessing data strcuture.
  */
 
 var groucho = window.groucho || {};
@@ -158,6 +154,19 @@ var groucho = window.groucho || {};
 
 
   /**
+   * Get a combined selector for all adjustments.
+   *
+   * @return {string}
+   */
+  groucho.adjustmentSelectors = function () {
+    var combinedString = '';
+    for (var i in groucho.config.adjust) {
+      combinedString = '[' + groucho.config.adjust[i].dataAttribute + ']';
+    }
+  };
+
+
+  /**
    * Data transforms due to version updates. Prevents past use data corruption.
    */
   groucho.schema = function () {
@@ -175,6 +184,61 @@ var groucho = window.groucho || {};
         groucho.storage.remove(keys[newKey].oldKey);
       }
     }
+  };
+
+
+  /**
+   * Get URL query parameter.
+   *
+   * http://stackoverflow.com/questions/19491336
+   *
+   * @param {string} param
+   *
+   * @return {string}
+   */
+  groucho.getQueryParam = function (param) {
+   var sPageURL = window.location.search.substring(1),
+       sURLVariables = sPageURL.split('&'),
+       sParameterName;
+
+   for (var i = 0; i < sURLVariables.length; i++) {
+     sParameterName = sURLVariables[i].split('=');
+     if (sParameterName[0] === param) {
+       return sParameterName[1];
+     }
+   }
+  };
+
+
+  /**
+   * Check for empty object (used for vocab term lists).
+   *
+   * @param {object} obj
+   */
+  groucho.isEmpty = function (obj) {
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+
+  /**
+   * Terms are always returned as a list.
+   *
+   * @param {object} obj
+   *
+   * @return {array}
+   */
+  groucho.makeArray = function (obj) {
+    var arr = [];
+    for (var i in obj) {
+      obj[i].id = i;
+      arr.push(obj[i]);
+    }
+    return arr;
   };
 
 })(window.jQuery || window.Zepto || window.$, groucho);
